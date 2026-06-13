@@ -1,0 +1,50 @@
+name: TimerWithCountdown
+options:
+  bundleIdPrefix: com.juliancruzsanchez
+  deploymentTarget:
+    iOS: "26.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+targets:
+  TimerWithCountdown:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.juliancruzsanchez.timerwcountdown
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Timer
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "6.0"
+        CODE_SIGNING_ALLOWED: NO
+  TimerWithCountdownTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - Tests
+    dependencies:
+      - target: TimerWithCountdown
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.juliancruzsanchez.timerwcountdown.tests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "6.0"
+schemes:
+  TimerWithCountdown:
+    build:
+      targets:
+        TimerWithCountdown: all
+        TimerWithCountdownTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - TimerWithCountdownTests

@@ -1,0 +1,295 @@
+/* styles.css — Workout Prep Timer */
+
+:root {
+  --bg: #0a0a0c;
+  --fg: #f5f5f7;
+  --fg-dim: rgba(245, 245, 247, 0.55);
+  --prep: #ff9f0a;
+  --run: #30d158;
+  --ring-stroke: 12;
+  --ring-radius: 140;
+  /* Circumference of r=140: 2 * pi * 140 ~= 879.6, rounded for SVG. */
+  --ring-circ: 880;
+  --ring-progress: 0; /* 0 = full ring, 1 = empty */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    Roboto, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  max-width: 540px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ---- Glass panel ----------------------------------------------------- */
+
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 1.25rem;
+}
+
+/* ---- Header / status ------------------------------------------------- */
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.5rem;
+}
+
+#status {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  transition: color 220ms ease;
+}
+
+/* ---- Center stage (ring + digits) ----------------------------------- */
+
+.stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.ring-wrap.visible { opacity: 1; }
+
+#ring {
+  width: min(78vw, 360px);
+  height: min(78vw, 360px);
+  transform: rotate(-90deg);
+}
+
+#ring circle.track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: var(--ring-stroke);
+}
+
+#ring circle.progress {
+  fill: none;
+  stroke: var(--prep);
+  stroke-width: var(--ring-stroke);
+  stroke-linecap: round;
+  stroke-dasharray: var(--ring-circ);
+  stroke-dashoffset: calc(var(--ring-circ) * var(--ring-progress));
+  transition: stroke-dashoffset 120ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ring circle.progress {
+    transition: none;
+  }
+}
+
+/* ---- Digits ---------------------------------------------------------- */
+
+#digits {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: clamp(72px, 22vw, 100px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: var(--fg);
+  transition: color 220ms ease, opacity 220ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  z-index: 1;
+}
+
+#digits .cs {
+  font-weight: 600;
+  font-size: 0.55em;
+  vertical-align: 0.05em;
+  margin-left: 0.05em;
+  opacity: 0.85;
+}
+
+/* Phase color modifiers */
+#digits.color-idle    { color: var(--fg); }
+#digits.color-prep    { color: var(--prep); }
+#digits.color-running { color: var(--run); }
+#digits.color-paused  { color: var(--fg-dim); }
+
+/* ---- Presets and stepper -------------------------------------------- */
+
+.config {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.presets {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.preset {
+  flex: 1;
+  min-height: 44px;
+  padding: 0.5rem 0.25rem;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease,
+    transform 80ms ease;
+}
+.preset:hover { background: rgba(255, 255, 255, 0.10); }
+.preset:active { transform: scale(0.97); }
+.preset.active {
+  background: rgba(255, 159, 10, 0.18);
+  border-color: rgba(255, 159, 10, 0.55);
+  color: var(--prep);
+}
+
+.stepper {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.stepper button {
+  min-width: 64px;
+  min-height: 44px;
+  padding: 0.5rem 1.25rem;
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background 160ms ease, transform 80ms ease;
+}
+.stepper button:hover { background: rgba(255, 255, 255, 0.10); }
+.stepper button:active { transform: scale(0.96); }
+
+/* ---- Control bar ---------------------------------------------------- */
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.controls button {
+  flex: 1;
+  min-height: 56px;
+  padding: 0.85rem 1rem;
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease,
+    color 180ms ease, transform 80ms ease;
+}
+
+.controls button:active { transform: scale(0.98); }
+
+#startBtn {
+  border-color: rgba(48, 209, 88, 0.65);
+  color: var(--run);
+}
+#startBtn:hover { background: rgba(48, 209, 88, 0.12); }
+
+#cancelBtn {
+  border-color: rgba(255, 159, 10, 0.6);
+  color: var(--prep);
+}
+#cancelBtn:hover { background: rgba(255, 159, 10, 0.12); }
+
+#pauseBtn, #resumeBtn {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+#pauseBtn:hover, #resumeBtn:hover { background: rgba(255, 255, 255, 0.12); }
+
+#resetBtn {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--fg-dim);
+}
+#resetBtn:hover { background: rgba(255, 255, 255, 0.08); color: var(--fg); }
+
+/* Hide attribute respected for all buttons + sections. */
+[hidden] { display: none !important; }
+
+/* ---- Focus styles --------------------------------------------------- */
+
+button:focus-visible,
+.preset:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+/* ---- SR-only --------------------------------------------------------- */
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}

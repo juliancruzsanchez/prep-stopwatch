@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Workout Prep Timer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="A prep countdown that flips to a stopwatch.">
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Prep Timer">
+  <meta name="theme-color" content="#0a0a0c">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <div class="status-row">
+      <span id="status" aria-live="polite">Ready</span>
+    </div>
+
+    <div class="stage">
+      <div class="ring-wrap" id="ringWrap" aria-hidden="true">
+        <svg id="ring" viewBox="0 0 320 320" width="320" height="320" role="img" aria-hidden="true">
+          <circle class="track"    cx="160" cy="160" r="140"></circle>
+          <circle class="progress"  cx="160" cy="160" r="140"></circle>
+        </svg>
+      </div>
+      <div id="digits" class="color-idle" aria-label="Timer">0:10</div>
+    </div>
+
+    <section id="configSection" class="config glass" aria-label="Prep duration">
+      <div class="presets" id="presets" role="group" aria-label="Preset prep durations">
+        <button class="preset" type="button" data-seconds="0">0s</button>
+        <button class="preset" type="button" data-seconds="5">5s</button>
+        <button class="preset" type="button" data-seconds="10">10s</button>
+        <button class="preset" type="button" data-seconds="15">15s</button>
+        <button class="preset" type="button" data-seconds="30">30s</button>
+      </div>
+      <div class="stepper" role="group" aria-label="Fine tune">
+        <button id="stepperMinus" type="button" aria-label="Decrease by 1 second">&minus;</button>
+        <button id="stepperPlus"  type="button" aria-label="Increase by 1 second">&plus;</button>
+      </div>
+    </section>
+
+    <section class="controls glass" aria-label="Controls">
+      <button id="startBtn"  type="button">Start</button>
+      <button id="cancelBtn" type="button" hidden>Cancel</button>
+      <button id="pauseBtn"  type="button" hidden>Pause</button>
+      <button id="resumeBtn" type="button" hidden>Resume</button>
+      <button id="resetBtn"  type="button" hidden>Reset</button>
+    </section>
+  </main>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
